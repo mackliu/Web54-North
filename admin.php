@@ -1,3 +1,4 @@
+<?php include_once "library.php";?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,16 @@
 <?php
 $pt=pathinfo(__FILE__);
 include "header.php";
+
+if(isset($_SESSIN['admin'])){
+
+}else{
+
+}
 ?>
+
+
+
 <script src="./library/jquery/jquery.js"></script>
 <script src="./library/bootstrap/bootstrap.js"></script>
 </body>
