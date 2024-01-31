@@ -133,10 +133,10 @@ function createCalendarRange(year, month) {
         nextYear += 1;
     }
     str += `<div class='w-100 d-flex justify-content-between align-items-center'>`;
-    str += `    <div class='prev-month col-1 text-left'> << </div>`;
+    str += `    <div class='prev-month col-1 text-left' data-year='${year}' data-month='${month}'> << </div>`;
     str += `    <div class='col-5 text-center'>${year}年${month}月</div>`;
     str += `    <div class='col-5 text-center'>${nextYear}年${nextMonth}月</div>`;
-    str += `    <div class='next-month col-1 text-right'> >> </div>`;
+    str += `    <div class='next-month col-1 text-right' data-year='${year}' data-month='${month}'> >> </div>`;
     str += "</div>";
     str += "<div class='d-flex'>";
     str += createCalendar(year, month);
@@ -156,7 +156,7 @@ function setEvents(){
     $(".next-month , .prev-month").on("click", function () {
     let year = $(this).data("year");
     let month = $(this).data("month");
-    
+    console.log(year,month)
     if($(this).hasClass("next-month")){ //下個月
         if (month+1 > 12) {
             month = 1;
@@ -172,6 +172,7 @@ function setEvents(){
             month -= 1;
         }
     }
+    console.log(year,month)
         createCalendarRange(year, month);
     })
 
