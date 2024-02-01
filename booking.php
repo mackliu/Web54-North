@@ -189,20 +189,25 @@ function setEvents(){
         $("#end").val(str);
         $("#days").val(1);
 
-        if(!selectedDateStart || (selectedDateEnd && selectedDateStart)){
+        //判斷選擇的日期是開始日期還是結束日期
+        if(!selectedDateStart || (selectedDateEnd && selectedDateStart)){ //如果開始日期還沒選擇，或者開始日期和結束日期都選擇了
             selectedDateStart = date;
             selectedDateEnd = null;
             $(this).addClass("start-date");
-            console.log('start',selectedDateStart)
-        }else if(selectedDateStart && !selectedDateEnd){
+        
+        }else if(selectedDateStart && !selectedDateEnd){ //如果開始日期已經選擇，結束日期還沒選擇
+            
             if(date >= selectedDateStart){
+                //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $(this).addClass("end-date");
-                console.log('end',selectedDateEnd)
+        
             }else{
-                selectedDateEnd = selectedDateStart;
+                //如果選擇的日期比開始日期還早，則將開始日期設為選擇的日期
+                alert("結束日期不能早於開始日期")
+                /* selectedDateEnd = selectedDateStart;
                 selectedDateStart = date;
-                console.log('the same day',selectedDateStart)
+                $(this).addClass("start-date");  */       
             }
             highlightRange(selectedDateStart,selectedDateEnd);
         }
