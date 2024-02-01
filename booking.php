@@ -24,6 +24,10 @@
         .ui-datepicker-range {
             background-color: #ffddee;
         }
+        .pass-date{
+            background-color: #EEEEEE;
+            color:#999999;
+        }
     </style>
 </head>
 <body>
@@ -86,27 +90,34 @@ include "header.php";
 <script src="./library/jquery-ui-1.13.2/jquery-ui.js"></script>
 <script src="./library/bootstrap/bootstrap.js"></script>
 <script>
-createCalendarRange(2024, 1, 2)
+let today = new Date((new Date()).getFullYear(),(new Date()).getMonth(),(new Date()).getDate(),0,0,0);
+createCalendarRange(today.getFullYear(), today.getMonth()+1, today.getDate())
 
 let selectedDateStart;
 let selectedDateEnd;
 
 function createCalendar(year, month) {
-    var date = new Date(year, month - 1, 1);
-    var day = date.getDay();
-    var days = new Date(year, month, 0).getDate();
-    var str = `<div class='w-100 p-1'>`;
+    let date = new Date(year, month - 1, 1);
+    let day = date.getDay();
+    let days = new Date(year, month, 0).getDate();
+    let str = `<div class='w-100 p-1'>`;
     str += `<table class='table table-bordered' data-year='${year}' data-month='${month}'>`;
     str += "<tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr>";
     str += "<tr>";
-    for (var i = 0; i < day; i++) {
+    for (let i = 0; i < day; i++) {
         str += "<td></td>";
     }
-    for (var i = 1; i <= days; i++) {
+    for (let i = 1; i <= days; i++) {
+        let thisDay = new Date(year, month - 1, i);
         if ((i + day - 1) % 7 == 0) {
             str += "<tr>";
         }
-        str += `<td class='td-date' data-date='${i}'>`;
+        
+        if(thisDay<today){
+            str += `<td class='pass-date' data-date='${i}'>`;
+        }else{
+            str += `<td class='td-date' data-date='${i}'>`;
+        }
         str += `<div class='col-day'>${i}</div>`;
         str += "<div class='col-price'>$5000</div>";
         str += "<div class='col-rooms'>可訂:5</div>";
@@ -123,8 +134,6 @@ function createCalendar(year, month) {
 
 function createCalendarRange(year, month) {
     let str = "";
-    
-
     let nextMonth = month + 1;
     let nextYear = year;
 
@@ -133,7 +142,11 @@ function createCalendarRange(year, month) {
         nextYear += 1;
     }
     str += `<div class='w-100 d-flex justify-content-between align-items-center'>`;
-    str += `    <div class='prev-month col-1 text-left' data-year='${year}' data-month='${month}'> << </div>`;
+    if(today.getFullYear() == year && today.getMonth()+1 == month){
+        str += `    <div class='col-1 text-left' data-year='${year}' data-month='${month}' style='color:#999'> << </div>`;
+    }else{
+        str += `    <div class='prev-month col-1 text-left' data-year='${year}' data-month='${month}'> << </div>`;
+    }
     str += `    <div class='col-5 text-center'>${year}年${month}月</div>`;
     str += `    <div class='col-5 text-center'>${nextYear}年${nextMonth}月</div>`;
     str += `    <div class='next-month col-1 text-right' data-year='${year}' data-month='${month}'> >> </div>`;
@@ -156,7 +169,7 @@ function setEvents(){
     $(".next-month , .prev-month").on("click", function () {
     let year = $(this).data("year");
     let month = $(this).data("month");
-    console.log(year,month)
+
     if($(this).hasClass("next-month")){ //下個月
         if (month+1 > 12) {
             month = 1;
@@ -172,7 +185,7 @@ function setEvents(){
             month -= 1;
         }
     }
-    console.log(year,month)
+
         createCalendarRange(year, month);
     })
 
