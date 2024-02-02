@@ -222,6 +222,7 @@ function setEvents(){
             selectedDateStart = date;
             selectedDateEnd = null;
             $(this).addClass("start-date");
+            fillBookingInfo(selectedDateStart,selectedDateStart);
         
         }else if(selectedDateStart && !selectedDateEnd){ //如果開始日期已經選擇，結束日期還沒選擇
             
@@ -229,6 +230,7 @@ function setEvents(){
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $(this).addClass("end-date");
+                fillBookingInfo(selectedDateStart,selectedDateEnd);
         
             }else if(date.getTime() == selectedDateStart.getTime()){
                 //如果選擇的日期和開始日期相同，則取消開始日期的選擇
@@ -242,6 +244,7 @@ function setEvents(){
                 $('.start-date').addClass("end-date");
                 $('.start-date').removeClass("start-date");
                 $(this).addClass("start-date");        
+                fillBookingInfo(selectedDateStart,selectedDateEnd);
             }
 
         }else{
@@ -265,12 +268,14 @@ function setEvents(){
                 selectedDateStart = date;
                 $(".start-date").removeClass("start-date");
                 $(this).addClass("start-date");
+                fillBookingInfo(selectedDateStart,selectedDateEnd);
 
             }else if(date > selectedDateStart){
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $('.end-date').removeClass("end-date");
                 $(this).addClass("end-date");
+                fillBookingInfo(selectedDateStart,selectedDateEnd);
             }
         }
         highlightRange(selectedDateStart,selectedDateEnd);
@@ -281,12 +286,11 @@ function setEvents(){
  * 填訂房資訊
  */
 function fillBookingInfo(start,end){
-    if(selectedDateStart && selectedDateEnd){
-        let days = (selectedDateEnd.getTime() - selectedDateStart.getTime()) / (1000 * 60 * 60 * 24);
-        $("#start").val(selectedDateStart.toLocaleDateString());
-        $("#end").val(selectedDateEnd.toLocaleDateString());
-        $("#days").val(days);
-    }
+    let day_list = ['日', '一', '二', '三', '四', '五', '六'];
+    $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+    $("#end").val(`${end.getFullYear()}-${end.getMonth()}-${end.getDate()} 星期${day_list[end.getDay()]}`);
+    let days = ((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))+1;
+    $("#days").val(days);
 }
 
 /**
