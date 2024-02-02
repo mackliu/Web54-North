@@ -201,7 +201,6 @@ function setEvents(){
         $("#start").val(str);
         $("#end").val(str);
         $("#days").val(1);
-        console.log(date)
         /**
          * 每一次點擊日期時的判斷
          * 1. 開始和結束日期都還沒選擇
@@ -209,17 +208,13 @@ function setEvents(){
          * 2. 開始日期已經選擇，結束日期還沒選擇
          *    a. 此時的點擊日期比開始日期還早，則將開始日期設為點擊日期，原本的開始日期變成結束日期
          *    b. 此時的點擊日期比開始日期還晚，則將結束日期設為點擊日期
-         *    c. 此時的點擊日期和開始日期相同，特殊狀況 1
+         *    c. 此時的點擊日期和開始日期相同，取消開始日期的選擇
          * 3. 開始日期和結束日期都選擇了
-         *    a. 此時的點擊日期如果比開始日期還早，則將開始日期設為點擊日期
-         *    b. 此時的點擊日期如果比結束日期還晚，則將結束日期設為點擊日期
-         *    c. 此時的點擊日期如果在開始日期和結束日期之間，則將結束日期設為點擊日期
-         *    d. 此時的點擊日期和開始日期相同，特殊狀況 2
-         *    e. 此時的點擊日期和結束日期相同，特殊狀況 2
+         *    a. 此時的點擊日期和開始日期相同，取消整個日期選擇
+         *    b. 此時的點擊日期和結束日期相同，取消結束日期的選擇
+         *    c. 此時的點擊日期如果比開始日期還早，則將開始日期設為點擊日期，等於提前開始日期
+         *    d. 此時的點擊日期如果比開始日期還晚，則將結束日期設為點擊日期，等於延後或提前結束日期
          * 4. 不可能有先選擇結束日期，再選擇開始日期的情況
-         * 特殊狀況：
-         * 1. 選擇開始日期後，結束日期點在開始日期同一個天的處理
-         * 2. 開始日期和結束日期都選擇後，再次點擊開始或結束日期的處理
          */
 
             //如果開始和結束日期都還沒選擇
@@ -237,7 +232,6 @@ function setEvents(){
         
             }else if(date.getTime() == selectedDateStart.getTime()){
                 //如果選擇的日期和開始日期相同，則取消開始日期的選擇
-                console.log('選擇的日期和開始日期相同')
                 selectedDateStart = null;
                 $(this).removeClass("start-date");
             }else{
@@ -253,10 +247,22 @@ function setEvents(){
         }else{
             //如果開始日期和結束日期都選擇了
             console.log('開始日期和結束日期都選擇了',date.getTime(),selectedDateEnd.getTime())
-            if(date < selectedDateStart){
+            if(date.getTime() == selectedDateEnd.getTime()){
+                //如果選擇的日期和結束日期相同，則取消結束日期的選擇
+                selectedDateEnd = null;
+                $(this).removeClass("end-date");
+
+            }else if(date.getTime() == selectedDateStart.getTime()){
+                //如果選擇的日期和開始日期相同，則取消整個日期選擇
+                console.log('選擇的日期和開始日期相同')
+                selectedDateStart = null;
+                selectedDateEnd = null;
+                $(this).removeClass("start-date");
+                $('.end-date').removeClass("end-date");
+
+            }else if(date < selectedDateStart){
                 //如果選擇的日期比開始日期還早，則將開始日期設為選擇的日期
                 selectedDateStart = date;
-                $('.start-date').addClass("end-date");
                 $(".start-date").removeClass("start-date");
                 $(this).addClass("start-date");
 
@@ -265,17 +271,33 @@ function setEvents(){
                 selectedDateEnd = date;
                 $('.end-date').removeClass("end-date");
                 $(this).addClass("end-date");
-                
-            }else if(date.getTime() == selectedDateEnd.getTime()){
-                //如果選擇的日期和結束日期相同，則取消結束日期的選擇
-                console.log('選擇的日期和結束日期相同')
-                selectedDateEnd = null;
-                $(this).removeClass("end-date");
-
             }
         }
         highlightRange(selectedDateStart,selectedDateEnd);
     })
+}
+
+/**
+ * 填訂房資訊
+ */
+function fillBookingInfo(start,end){
+    if(selectedDateStart && selectedDateEnd){
+        let days = (selectedDateEnd.getTime() - selectedDateStart.getTime()) / (1000 * 60 * 60 * 24);
+        $("#start").val(selectedDateStart.toLocaleDateString());
+        $("#end").val(selectedDateEnd.toLocaleDateString());
+        $("#days").val(days);
+    }
+}
+
+/**
+ * 取消訂房選擇
+ */
+function cancelSelect(){
+    selectedDateStart = null;
+    selectedDateEnd = null;
+    $(".start-date").removeClass("start-date");
+    $(".end-date").removeClass("end-date");
+    $(".ui-datepicker-range").removeClass("ui-datepicker-range");
 }
 
 function highlightRange(){
