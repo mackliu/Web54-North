@@ -285,21 +285,37 @@ function fillBookingInfo(start,end){
         //沒有日期選擇時，清空訂房資訊
         $("#start").val("");
         $("#end").val("");
-        $("#days").val(0);
-        return;
+        days=0;
+        $("#days").val(days);
+        $("#roomnum").val("");
     }else if(start && !end){
         //開始日期有選擇，結束日期沒有選擇時，開始和結束日為同一天，天數設為1
         $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
         $("#end").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
-        $("#days").val(1);
+        days=1;
+        $("#days").val(days);
+        if($("#roomnum").val() == ""){
+            selectRoom();
+        }
     }else if(start && end){
         //開始日期和結束日期都有選擇時，填入開始和結束日期，計算天數
         $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
         $("#end").val(`${end.getFullYear()}-${end.getMonth()}-${end.getDate()} 星期${day_list[end.getDay()]}`);
         days=((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))+1;
         $("#days").val(days);
+        if($("#roomnum").val() == ""){
+            selectRoom();
+        }
     }
     
+
+    
+}
+
+function selectRoom(){
+    $.get("api/select_room.php",function(roomnum){
+        $("#roomnum").val(roomnum);
+    })
 }
 
 /**
