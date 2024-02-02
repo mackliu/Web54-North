@@ -82,7 +82,7 @@ include "header.php";
         </div>
         <div class="d-flex justify-content-around w-50">
             <button class="btn btn-primary">確定訂房</button>
-            <button class="btn btn-warning">取消</button>
+            <button class="btn btn-warning" onclick="cancelSelect()">取消</button>
         </div>
     </div>
 </main>
@@ -222,7 +222,6 @@ function setEvents(){
             selectedDateStart = date;
             selectedDateEnd = null;
             $(this).addClass("start-date");
-            fillBookingInfo(selectedDateStart,selectedDateStart);
         
         }else if(selectedDateStart && !selectedDateEnd){ //如果開始日期已經選擇，結束日期還沒選擇
             
@@ -230,7 +229,6 @@ function setEvents(){
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $(this).addClass("end-date");
-                fillBookingInfo(selectedDateStart,selectedDateEnd);
         
             }else if(date.getTime() == selectedDateStart.getTime()){
                 //如果選擇的日期和開始日期相同，則取消開始日期的選擇
@@ -244,12 +242,10 @@ function setEvents(){
                 $('.start-date').addClass("end-date");
                 $('.start-date').removeClass("start-date");
                 $(this).addClass("start-date");        
-                fillBookingInfo(selectedDateStart,selectedDateEnd);
             }
 
         }else{
             //如果開始日期和結束日期都選擇了
-            console.log('開始日期和結束日期都選擇了',date.getTime(),selectedDateEnd.getTime())
             if(date.getTime() == selectedDateEnd.getTime()){
                 //如果選擇的日期和結束日期相同，則取消結束日期的選擇
                 selectedDateEnd = null;
@@ -257,7 +253,6 @@ function setEvents(){
 
             }else if(date.getTime() == selectedDateStart.getTime()){
                 //如果選擇的日期和開始日期相同，則取消整個日期選擇
-                console.log('選擇的日期和開始日期相同')
                 selectedDateStart = null;
                 selectedDateEnd = null;
                 $(this).removeClass("start-date");
@@ -268,17 +263,15 @@ function setEvents(){
                 selectedDateStart = date;
                 $(".start-date").removeClass("start-date");
                 $(this).addClass("start-date");
-                fillBookingInfo(selectedDateStart,selectedDateEnd);
-
             }else if(date > selectedDateStart){
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $('.end-date').removeClass("end-date");
                 $(this).addClass("end-date");
-                fillBookingInfo(selectedDateStart,selectedDateEnd);
             }
         }
         highlightRange(selectedDateStart,selectedDateEnd);
+        fillBookingInfo(selectedDateStart,selectedDateEnd);
     })
 }
 
@@ -287,10 +280,26 @@ function setEvents(){
  */
 function fillBookingInfo(start,end){
     let day_list = ['日', '一', '二', '三', '四', '五', '六'];
-    $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
-    $("#end").val(`${end.getFullYear()}-${end.getMonth()}-${end.getDate()} 星期${day_list[end.getDay()]}`);
-    let days = ((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))+1;
-    $("#days").val(days);
+    let days;
+    if(!start && !end){
+        //沒有日期選擇時，清空訂房資訊
+        $("#start").val("");
+        $("#end").val("");
+        $("#days").val(0);
+        return;
+    }else if(start && !end){
+        //開始日期有選擇，結束日期沒有選擇時，開始和結束日為同一天，天數設為1
+        $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#end").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#days").val(1);
+    }else if(start && end){
+        //開始日期和結束日期都有選擇時，填入開始和結束日期，計算天數
+        $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#end").val(`${end.getFullYear()}-${end.getMonth()}-${end.getDate()} 星期${day_list[end.getDay()]}`);
+        days=((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))+1;
+        $("#days").val(days);
+    }
+    
 }
 
 /**
@@ -302,6 +311,7 @@ function cancelSelect(){
     $(".start-date").removeClass("start-date");
     $(".end-date").removeClass("end-date");
     $(".ui-datepicker-range").removeClass("ui-datepicker-range");
+    fillBookingInfo(selectedDateStart,selectedDateEnd);
 }
 
 function highlightRange(){
