@@ -80,9 +80,8 @@ function order(){
                days:parseInt($("#days").val()),
                start:$("#start").val(),
                end:$("#end").val(),
-               roomnum:$("#roomnum").val(),
-               sum:parseInt($("#rooms").val())*parseInt($("#days").val())*5000,
-               deposit:parseInt($("#rooms").val())*parseInt($("#days").val())*5000*0.3
+               roomnum:parseInt($("#roomnum").val().replace("room","")),
+               payment:parseInt($("#rooms").val())*parseInt($("#days").val())*5000,
             };
 
         $.post("./front/order.php",order,function(res){

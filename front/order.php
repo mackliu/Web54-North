@@ -15,7 +15,7 @@ $_SESSION['booking']=$_POST;
     <div class="my-2 d-flex w-100">
         <div class="d-flex w-50">
             <label class='col-3 text-center'  for="roomnum">房號</label>
-            <input type="text" name="roomnum" id="roomnum" value="<?=$_POST['roomnum'];?>" class="form-control" disabled> 
+            <input type="text" name="roomnum" id="roomnum" value="room<?=sprintf("%02d",$_POST['roomnum']);?>" class="form-control" disabled> 
         </div>
     </div>        
     <div class="w-100 my-2 ">
@@ -36,17 +36,14 @@ $_SESSION['booking']=$_POST;
     </div>
     <div class="w-100 my-2">
         <div class="w-50 d-flex">
-            <label class="col-3 text-center" for="sum">總金額</label>
-            <?php
-            $sum = $_POST['rooms']*$_POST['days']*5000;
-            ?>
-            <input type="text" name="sum" id="sum" value="<?=$sum;?>" class="form-control">
+            <label class="col-3 text-center" for="payment">總金額</label>
+            <input type="text" name="payment" id="payment" value="<?=$_POST['payment'];?>" class="form-control">
         </div>
     </div>
     <div class="w-100 my-2">
         <div class="w-50 d-flex">
             <label class="col-3 text-center" for="deposit">需付訂金</label>
-            <input type="text" name="deposit" id="deposit" value="<?=$sum*0.3;?>" class="form-control">
+            <input type="text" name="deposit" id="deposit" value="<?=$_POST['payment']*0.3;?>" class="form-control">
         </div>
     </div>
     <div class="d-flex justify-content-around w-50 my-4 mx-auto">
