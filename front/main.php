@@ -2,7 +2,7 @@
     <div id="datepicker"></div>
 
     <!--訂房資訊區塊-->
-    <div class="booking-info form-group p-3 w-100">
+    <div id="orderForm" class="booking-info form-group p-3 w-100">
         <div class="d-flex w-100">
             <div class="my-2 d-flex w-50">
                 <label class='col-3 text-center'  for="rooms">訂房間數</label>
@@ -42,7 +42,7 @@
                 <button class='select-room col-4 mx-1 btn btn-info' onclick="selectRoom()">選擇房號</button>
             </div>
         </div>
-        <div class="d-flex justify-content-around w-50 m-auto">
+        <div class="d-flex justify-content-around w-50 mx-auto my-4">
             <button class="btn btn-primary" onclick="order()">確定訂房</button>
             <button class="btn btn-warning" onclick="cancelSelect()">取消</button>
         </div>
@@ -50,6 +50,7 @@
     <div id="modal">
 
     </div>
+    <div id="confirm"></div>
 
 
     <script>
