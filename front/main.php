@@ -78,8 +78,8 @@ function order(){
     //取得表單各欄位資料
     let order={rooms:parseInt($("#rooms").val()),
                days:parseInt($("#days").val()),
-               start:$("#start").val(),
-               end:$("#end").val(),
+               start:$("#start").val().split(" ")[0],
+               end:$("#end").val().split(" ")[0],
                roomnum:parseInt($("#roomnum").val().replace("room","")),
                payment:parseInt($("#rooms").val())*parseInt($("#days").val())*5000,
             };
@@ -93,7 +93,8 @@ function order(){
  * 產生指定年月的月曆
  * 回傳值為月曆的html字串
  */
-function createCalendar(year, month) {
+function createCalendar(year, month,rooms) {
+    console.log(rooms)
     let date = new Date(year, month - 1, 1);
     let day = date.getDay();
     let days = new Date(year, month, 0).getDate();
@@ -117,7 +118,11 @@ function createCalendar(year, month) {
         }
         str += `<div class='col-day'>${i}</div>`;
         str += "<div class='col-price'>$5000</div>";
-        str += "<div class='col-rooms'>可訂:5</div>";
+        if(rooms[i]!==undefined){
+            str += `<div class='col-rooms'>可訂:${8-rooms[i]}</div>`;
+        }else{
+            str += "<div class='col-rooms'>可訂:8</div>";
+        }
         str += "</td>";
 
         if ((i + day - 1) % 7 == 6) {
@@ -139,6 +144,7 @@ function createCalendarRange(year, month) {
         nextMonth -= 12;
         nextYear += 1;
     }
+
     str += `<div class='w-100 d-flex justify-content-between align-items-center'>`;
     if(today.getFullYear() == year && today.getMonth()+1 == month){
         str += `    <div class='col-1 text-left' data-year='${year}' data-month='${month}' style='color:#999'> << </div>`;
@@ -150,12 +156,15 @@ function createCalendarRange(year, month) {
     str += `    <div class='next-month col-1 text-right' data-year='${year}' data-month='${month}'> >> </div>`;
     str += "</div>";
     str += "<div class='d-flex'>";
-    str += createCalendar(year, month);
-    str += createCalendar( nextYear,nextMonth);
-    str += "</div>";
-    $("#datepicker").html(str);
-
-    setEvents();
+    $.get("./api/get_booked_rooms.php",{year,month,nextYear,nextMonth},function(rooms){
+        rooms=JSON.parse(rooms);
+        str += createCalendar(year, month,rooms.thisMonth);
+        str += createCalendar( nextYear,nextMonth,rooms.nextMonth);
+        str += "</div>";
+        $("#datepicker").html(str);
+    
+        setEvents();
+    })
 }
 
 /**
@@ -182,7 +191,7 @@ function setEvents(){
         }else{
             month -= 1;
         }
-    }
+    }      
         createCalendarRange(year, month);
     })
 
@@ -191,13 +200,9 @@ function setEvents(){
         let year = $(this).parents("table").data("year");
         let month = $(this).parents("table").data("month");
         let day = $(this).data("date");
-        let date = new Date(year, month - 1, day);
+        let date = new Date(year, month-1, day);
         let dayOfWeek = date.getDay();
         let str = "";
-        str += `${year}年${month}月${day}日 星期${dayOfWeek}`;
-        $("#start").val(str);
-        $("#end").val(str);
-        $("#days").val(1);
         /**
          * 每一次點擊日期時的判斷
          * 1. 開始和結束日期都還沒選擇
@@ -297,16 +302,16 @@ function fillBookingInfo(start,end){
         $("#roomnum").val("");
     }else if(start && !end){
         //開始日期有選擇，結束日期沒有選擇時，開始和結束日為同一天，天數設為1
-        $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
-        $("#end").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#start").val(`${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#end").val(`${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()} 星期${day_list[start.getDay()]}`);
         days=1;
         $("#days").val(days);
         if($("#roomnum").val() == ""){
         }
     }else if(start && end){
         //開始日期和結束日期都有選擇時，填入開始和結束日期，計算天數
-        $("#start").val(`${start.getFullYear()}-${start.getMonth()}-${start.getDate()} 星期${day_list[start.getDay()]}`);
-        $("#end").val(`${end.getFullYear()}-${end.getMonth()}-${end.getDate()} 星期${day_list[end.getDay()]}`);
+        $("#start").val(`${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()} 星期${day_list[start.getDay()]}`);
+        $("#end").val(`${end.getFullYear()}-${end.getMonth()+1}-${end.getDate()} 星期${day_list[end.getDay()]}`);
         days=((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))+1;
         $("#days").val(days);
         if($("#roomnum").val() == ""){

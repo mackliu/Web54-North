@@ -15,8 +15,9 @@ if($_POST['start']==$_POST['end']){
     $sql="insert into `room_booked` (`date`,`roomnum`,`orderno`) values('{$_POST['start']}','{$_POST['roomnum']}','{$_POST['no']}')";
     $pdo->exec($sql);
 }else{
-    for($i=1;$i<=$_POST['days'];$i++){
-        $sql="insert into `room_booked` (`date`,`roomnum`,`orderno`) values('".date("Y-m-d",strtotime($_POST['start']."+$i days"))."','{$_POST['roomnum']}','{$_POST['no']}')";
+    for($i=0;$i<$_POST['days'];$i++){
+        $nextday=date("Y-m-d",strtotime("+$i days",strtotime($_POST['start'])));
+        $sql="insert into `room_booked` (`date`,`roomnum`,`orderno`) values('{$nextday}','{$_POST['roomnum']}','{$_POST['no']}')";
         $pdo->exec($sql);
     }
 }
