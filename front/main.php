@@ -69,8 +69,22 @@ function selectRoom(){
 }
 
 function autoroom(){
-    $.get("./api/autoroom.php",function(roomnum){
-        $("#roomnum").val(roomnum);
+    if(!selectedDateStart){
+        alert("請先選擇入住日期");
+        return;
+    }
+    let start,end;
+        start=`${selectedDateStart.getFullYear()}-${String(selectedDateStart.getMonth()+1).padStart(2,'0')}-${String(selectedDateStart.getDate()).padStart(2,'0')}`;
+    if(selectedDateEnd==null){
+        end=start;
+    }else{
+        end=`${selectedDateEnd.getFullYear()}-${String(selectedDateEnd.getMonth()+1).padStart(2,'0')}-${String(selectedDateEnd.getDate()).padStart(2,'0')}`;
+    }
+    $.get("./api/get_booked_rooms.php",{start,end},function(bookedRooms){
+        bookedRooms=JSON.parse(bookedRooms);
+        let seed=Math.floor(Math.random()*bookedRooms.diffrooms.length);
+        let roomnum=bookedRooms.diffrooms[seed];
+        $("#roomnum").val(`room${String(roomnum).padStart(2,'0')}`);
     })
 }
 
@@ -94,10 +108,10 @@ function order(){
  * 回傳值為月曆的html字串
  */
 function createCalendar(year, month,rooms) {
-    console.log(rooms)
     let date = new Date(year, month - 1, 1);
     let day = date.getDay();
     let days = new Date(year, month, 0).getDate();
+
     let str = `<div class='w-100 p-1'>`;
     str += `<table class='table table-bordered' data-year='${year}' data-month='${month}'>`;
     str += "<tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr>";
@@ -107,19 +121,21 @@ function createCalendar(year, month,rooms) {
     }
     for (let i = 1; i <= days; i++) {
         let thisDay = new Date(year, month - 1, i);
+        let dateStr=`${year}-${String(month).padStart(2,'0')}-${String(i).padStart(2,'0')}`
+
         if ((i + day - 1) % 7 == 0) {
             str += "<tr>";
         }
         
         if(thisDay<today){
-            str += `<td class='pass-date' data-date='${i}'>`;
+            str += `<td class='pass-date' data-date='${i}' data-fulldate='${dateStr}'>`;
         }else{
-            str += `<td class='td-date' data-date='${i}'>`;
+            str += `<td class='td-date' data-date='${i}' data-fulldate='${dateStr}'>`;
         }
         str += `<div class='col-day'>${i}</div>`;
         str += "<div class='col-price'>$5000</div>";
-        if(rooms[i]!==undefined){
-            str += `<div class='col-rooms'>可訂:${8-rooms[i]}</div>`;
+        if(rooms[dateStr]!==undefined){
+            str += `<div class='col-rooms'>可訂:${8-rooms[dateStr].count}</div>`;
         }else{
             str += "<div class='col-rooms'>可訂:8</div>";
         }
@@ -144,7 +160,7 @@ function createCalendarRange(year, month) {
         nextMonth -= 12;
         nextYear += 1;
     }
-
+    
     str += `<div class='w-100 d-flex justify-content-between align-items-center'>`;
     if(today.getFullYear() == year && today.getMonth()+1 == month){
         str += `    <div class='col-1 text-left' data-year='${year}' data-month='${month}' style='color:#999'> << </div>`;
@@ -156,10 +172,13 @@ function createCalendarRange(year, month) {
     str += `    <div class='next-month col-1 text-right' data-year='${year}' data-month='${month}'> >> </div>`;
     str += "</div>";
     str += "<div class='d-flex'>";
-    $.get("./api/get_booked_rooms.php",{year,month,nextYear,nextMonth},function(rooms){
-        rooms=JSON.parse(rooms);
-        str += createCalendar(year, month,rooms.thisMonth);
-        str += createCalendar( nextYear,nextMonth,rooms.nextMonth);
+    start=`${year}-${String(month).padStart(2,'0')}-01`;
+    end=`${nextYear}-${String(nextMonth).padStart(2,'0')}-${(new Date(nextYear,nextMonth,0).getDate())}`;
+
+    $.get("./api/get_booked_rooms.php",{start,end},function(bookedRooms){
+        bookedRooms=JSON.parse(bookedRooms);
+        str += createCalendar(year, month,bookedRooms);
+        str += createCalendar( nextYear,nextMonth,bookedRooms);
         str += "</div>";
         $("#datepicker").html(str);
     
@@ -224,7 +243,6 @@ function setEvents(){
             selectedDateStart = date;
             selectedDateEnd = null;
             $(this).addClass("start-date");
-            autoroom();
         
         }else if(selectedDateStart && !selectedDateEnd){ //如果開始日期已經選擇，結束日期還沒選擇
             

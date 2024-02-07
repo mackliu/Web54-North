@@ -1,6 +1,5 @@
 <?php
-echo 'room';
-echo rand(1, 8);
+include_once "../library.php";
 
 
 ?>

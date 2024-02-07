@@ -30,12 +30,22 @@
                         ?>
                     </div>
                     <div class="p-3 mx-auto w-100 text-center">
-                        <button class="btn btn-primary">確定選取</button>
-                        <button class="btn btn-warning">取消選取</button>
-                        <button class="btn btn-secondary">放棄離開</button>
+                        <button class="ok btn btn-primary">確定選取</button>
+                        <button class="cancel btn btn-warning">取消選取</button>
+                        <button class="quick btn btn-secondary">放棄離開</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+$(".quick").on("click",function(){
+    $("#selectRoom").modal("hide");
+    $("#selectRoom").on("hidden.bs.modal",function(){
+        $("#selectRoom").modal("dispose");
+        $("#modal").html("");
+    });
+});
+
+</script>
