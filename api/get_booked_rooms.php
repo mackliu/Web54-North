@@ -20,7 +20,7 @@ extract($_GET);
 $orders=$pdo->query("select `date`,group_concat(`roomnum`) as 'roomnum' from `room_booked` where `date` between '{$start}' AND  '{$end}' group by `date`")->fetchAll(PDO::FETCH_ASSOC);
 
 $orders=array_map(function($item){
-    $item['roomnum']=explode(",",$item['roomnum']);
+    $item['roomnum']=array_unique(explode(",",$item['roomnum']));
     $item['count']=count($item['roomnum']);
     $item['year']=explode("-",$item['date'])[0];
     $item['month']=(int)explode("-",$item['date'])[1];
@@ -38,6 +38,7 @@ $unirooms=array_unique($unirooms);
 $rooms=["1","2","3","4","5","6","7","8"];
 $diffrooms=array_diff($rooms,$unirooms);
 sort($diffrooms);
+sort($unirooms);
 $result['unirooms']=$unirooms;
 $result['diffrooms']=$diffrooms;
 echo json_encode($result);

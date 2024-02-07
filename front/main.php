@@ -61,11 +61,21 @@ let selectedDateStart;
 let selectedDateEnd;
 
 function selectRoom(){
-    $.post("./front/select_room.php",{start:$("#start").val(),roomnum:$("#roomnum").val()},function(rooms){
-        $("#modal").html(rooms);
-        $("#selectRoom").modal("show");
+    if(!selectedDateStart){
+        alert("請先選擇入住日期");
+        return;
+    }
+    let start=`${selectedDateStart.getFullYear()}-${String(selectedDateStart.getMonth()+1).padStart(2,'0')}-${String(selectedDateStart.getDate()).padStart(2,'0')}`;
+    
+    $.get("./api/get_booked_rooms.php",{start,end:start},(bookedRooms)=>{
+        bookedRooms=JSON.parse(bookedRooms);
+        $.post("./front/select_room.php",{start,bookedRooms},function(rooms){
+            $("#modal").html(rooms);
+        
+        
+            $("#selectRoom").modal("show");
+        })
     })
-
 }
 
 function autoroom(){

@@ -14,17 +14,16 @@
                     </div>
                     <div class="p-3 w-100 d-flex flex-wrap">
                         <?php
-                        $selected=intval(mb_substr($_POST['roomnum'],4,2));
-
+                        $bookedRooms=$_POST['bookedRooms']['unirooms'];
                         for($i=1;$i<=8;$i++){
-                            echo "<div class='col-3 p2 my-2'>";
-                            if($i==$selected){
-                                echo "    <div class='text-center rounded bg-success border py-3'>";
+                            echo "<div class='col-3 p2 my-2' data-num='$i'>";
+                            if(in_array($i,$bookedRooms)){
+                                echo "  <div class='text-center rounded border py-3 bg-secondary text-light'>";
                             }else{
-                                echo "    <div class='text-center rounded border py-3'>";
+                                echo "  <div class='can-booking text-center rounded border py-3'>";
                             }
-                            echo "Room" . sprintf("%02d",$i);
-                            echo "</div>";
+                            echo    "Room" . sprintf("%02d",$i);
+                            echo "  </div>";
                             echo "</div>";
                         }
                         ?>
