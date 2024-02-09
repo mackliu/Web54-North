@@ -99,6 +99,10 @@ function autoroom(){
 }
 
 function order(){
+    if($("#roomnum").val()==""){
+        alert("請先選擇房號");
+        return;
+    }
     //取得表單各欄位資料
     let order={rooms:parseInt($("#rooms").val()),
                days:parseInt($("#days").val()),

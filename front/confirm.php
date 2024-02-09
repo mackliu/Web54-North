@@ -20,20 +20,31 @@
     </div>
     <div class="d-flex justify-content-around mx-auto my-4 w-50">
         <button class="btn btn-primary" onclick='checkout()'>送出</button>
-        <button class="btn btn-warning">重設</button>
+        <button class="btn btn-warning" onclick='clean()'>重設</button>
     </div>
 </div>
 
 <script>
-    function checkout(){
-        let form={
-            name:$("#name").val(),
-            email:$("#email").val(),
-            tel:$("#tel").val(),
-            note:$("#note").val()
-        }
-        $.post("./api/checkout.php",form,function(res){
-            $("main").html(res);
-        })
+function checkout(){
+    if($("#name").val()=="" || $("#email").val()=="" || $("#tel").val()==""){
+        alert("請填寫完整的聯絡資訊");
+        return;
     }
+    let form={
+        name:$("#name").val(),
+        email:$("#email").val(),
+        tel:$("#tel").val(),
+        note:$("#note").val()
+    }
+    $.post("./api/checkout.php",form,function(res){
+        $("main").html(res);
+    })
+}
+
+function clean(){
+    $("#name").val("");
+    $("#email").val("");
+    $("#tel").val("");
+    $("#note").val("");
+}
 </script>

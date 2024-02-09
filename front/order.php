@@ -48,7 +48,8 @@ $_SESSION['booking']=$_POST;
     </div>
     <div class="d-flex justify-content-around w-50 my-4 mx-auto">
         <button class="btn btn-primary" onclick="loadpage('confirm')">確定訂房</button>
-        <button class="btn btn-warning" onclick="cancelSelect()">取消</button>
+            <!--題目未說明取消的功能，因此先重整頁面，回到日曆選擇頁面-->
+        <button class="btn btn-warning" onclick="location.reload()">取消</button>
     </div>
 </div>
 
