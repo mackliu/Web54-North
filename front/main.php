@@ -255,11 +255,13 @@ function setEvents(){
          * 4. 不可能有先選擇結束日期，再選擇開始日期的情況
          */
 
-        //如果開始和結束日期都還沒選擇
+        //如果選擇的日期區間沒有空房，則取消選擇
         if($(this).find(".last-rooms").text()==''){
             alert("此日期無空房，請重新選擇日期");
             return;
         }
+
+        //如果開始和結束日期都還沒選擇
         if(!selectedDateStart  && !selectedDateEnd){ 
             selectedDateStart = date;
             selectedDateEnd = null;
@@ -321,18 +323,29 @@ function setEvents(){
 
             }
         }
+            //檢查選擇的日期區間是否有空房
             chknull=chknullroom(date);
             if(chknull.status==true){
+                //如果選擇的日期區間沒有空房，則取消選擇
                 daystr=`${chknull.date.getFullYear()}-${String(chknull.date.getMonth()+1).padStart(2,'0')}-${String(chknull.date.getDate()).padStart(2,'0')}`;
                 alert(`此期間因${daystr}無空房，請重新選擇日期`);
+
+                //將日期選擇變數設為null
                 selectedDateStart = null;
+                selectedDateEnd = null;
+
+                //將日期選擇樣式取消
                 $(".start-date").removeClass("start-date");
                 $(".end-date").removeClass("end-date");
-            $(".select-room").attr("disabled",false);
-                selectedDateEnd = null;
+                $(".select-room").attr("disabled",false);
+
+                //使用return結束函式，不執後面的高亮和填訂房資訊
                 return;
             }
+        //根據選擇的日期區間高亮顯示
         highlightRange(selectedDateStart,selectedDateEnd);
+
+        //根據選擇的日期區間填訂房資訊
         fillBookingInfo(selectedDateStart,selectedDateEnd);
     })
 }
