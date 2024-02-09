@@ -144,14 +144,16 @@ function createCalendar(year, month,rooms) {
         if(thisDay<today){
             str += `<td class='pass-date' data-date='${i}' data-fulldate='${dateStr}'>`;
         }else{
-            str += `<td class='td-date' data-date='${i}' data-fulldate='${dateStr}'>`;
+            str += `<td class='td-date' data-date='${i}' data-fulldate='${dateStr}' >`;
         }
         str += `<div class='col-day'>${i}</div>`;
         str += "<div class='col-price'>$5000</div>";
-        if(rooms[dateStr]!==undefined){
-            str += `<div class='col-rooms'>可訂:${8-rooms[dateStr].count}</div>`;
+        if(rooms[dateStr]!==undefined && rooms[dateStr].count<8){
+            str += `<div class='col-rooms'>可訂:<span class='last-rooms'>${8-rooms[dateStr].count}</span></div>`;
+        }else if(rooms[dateStr]!==undefined && rooms[dateStr].count>=8){
+            str += "<div class='col-rooms'>無空房<span class='last-rooms'></span></div>";
         }else{
-            str += "<div class='col-rooms'>可訂:8</div>";
+            str += "<div class='col-rooms'>可訂:<span class='last-rooms'>8</div>";
         }
         str += "</td>";
 
@@ -235,7 +237,8 @@ function setEvents(){
         let day = $(this).data("date");
         let date = new Date(year, month-1, day);
         let dayOfWeek = date.getDay();
-        let str = "";
+        let daystr = "";
+        let chknull=null;
         /**
          * 每一次點擊日期時的判斷
          * 1. 開始和結束日期都還沒選擇
@@ -252,14 +255,18 @@ function setEvents(){
          * 4. 不可能有先選擇結束日期，再選擇開始日期的情況
          */
 
-            //如果開始和結束日期都還沒選擇
+        //如果開始和結束日期都還沒選擇
+        if($(this).find(".last-rooms").text()==''){
+            alert("此日期無空房，請重新選擇日期");
+            return;
+        }
         if(!selectedDateStart  && !selectedDateEnd){ 
             selectedDateStart = date;
             selectedDateEnd = null;
             $(this).addClass("start-date");
         
         }else if(selectedDateStart && !selectedDateEnd){ //如果開始日期已經選擇，結束日期還沒選擇
-            
+
             if(date > selectedDateStart){
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
@@ -281,7 +288,6 @@ function setEvents(){
                 $(this).addClass("start-date");
                 $(".select-room").attr("disabled",true);        
             }
-
         }else{
             //如果開始日期和結束日期都選擇了
             if(date.getTime() == selectedDateEnd.getTime()){
@@ -306,6 +312,7 @@ function setEvents(){
                 $(".select-room").attr("disabled",true);
 
             }else if(date > selectedDateStart){
+
                 //如果選擇的日期比開始日期還晚，則將結束日期設為選擇的日期
                 selectedDateEnd = date;
                 $('.end-date').removeClass("end-date");
@@ -314,11 +321,38 @@ function setEvents(){
 
             }
         }
+            chknull=chknullroom(date);
+            if(chknull.status==true){
+                daystr=`${chknull.date.getFullYear()}-${String(chknull.date.getMonth()+1).padStart(2,'0')}-${String(chknull.date.getDate()).padStart(2,'0')}`;
+                alert(`此期間因${daystr}無空房，請重新選擇日期`);
+                selectedDateStart = null;
+                $(".start-date").removeClass("start-date");
+                $(".end-date").removeClass("end-date");
+            $(".select-room").attr("disabled",false);
+                selectedDateEnd = null;
+                return;
+            }
         highlightRange(selectedDateStart,selectedDateEnd);
         fillBookingInfo(selectedDateStart,selectedDateEnd);
     })
 }
 
+function chknullroom(){
+    let chk={status:false,date:''};
+    $(".td-date").each(function(){
+        let year = $(this).parents("table").data("year");
+        let month = $(this).parents("table").data("month");
+        let day = $(this).data("date");
+        let date = new Date(year, month - 1, day);
+        if(date > selectedDateStart && date < selectedDateEnd){
+            if($(this).find(".last-rooms").text()==''){
+                chk.status=true;
+                chk.date=date;
+            }
+        }
+    })
+    return chk;
+}
 /**
  * 填訂房資訊
  */
