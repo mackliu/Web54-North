@@ -1,8 +1,5 @@
 <?php
-$orders=q("select * from `orders`");
-
-
-
+    $orders=q("select * from `orders`");
 ?>
 <table class='table'>
 <tr>
@@ -36,9 +33,18 @@ foreach($orders as $order){
 }
 ?>
 </table>
+
+
+<div id="modal">
+    
+</div>
+
 <script>
 function edit(table,id){
-    location.href=`admin.php?do=edit&table=${table}&id=${id}`;
+    $.post("admin/edit_order.php",{table,id},function(modal){
+        $("#modal").html(modal);
+        $("#editOrder").modal("show");
+    })
 }
 function del(table,id){
     if(confirm("確定要刪除此筆資料?")){

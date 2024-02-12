@@ -71,7 +71,6 @@ if(isset($_SESSION['admin'])){
 }
 ?>
 
-
 <script src="./library/bootstrap/bootstrap.js"></script>
 </body>
 </html>
